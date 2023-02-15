@@ -2,8 +2,10 @@ package array
 
 import (
 	"fmt"
+	"math/rand"
 	"reflect"
 	"sort"
+	"time"
 )
 
 type Numerable interface {
@@ -57,17 +59,18 @@ func columnParse[K BasicType, V any](array any, columnKey string, indexKey strin
 			case reflect.Map:
 				for _, e := range item.MapKeys() {
 					if e.Interface().(string) == indexKey && isMap {
-						key = item.MapIndex(e).Interface().(K)
+						key, _ = item.MapIndex(e).Interface().(K)
 					}
 					if e.Interface().(string) == columnKey {
-						value = item.MapIndex(e).Interface().(V)
+						value, _ = item.MapIndex(e).Interface().(V)
 					}
 				}
 			case reflect.Struct:
 				if isMap {
-					key = item.FieldByName(indexKey).Interface().(K)
+					key, _ = item.FieldByName(indexKey).Interface().(K)
 				}
-				value = item.FieldByName(columnKey).Interface().(V)
+				value, _ = item.FieldByName(columnKey).Interface().(V)
+
 			default:
 				panic(fmt.Errorf("暂不支持的类型"))
 			}
@@ -216,8 +219,15 @@ func Intersect[T BasicType](array1, array2 []T, arrays ...[]T) []T {
 	return intersect
 }
 
-func Combine() {
-
+func Combine[K BasicType, V any](keys []K, values []V) map[K]V {
+	if len(keys) != len(values) {
+		return nil
+	}
+	var combine = map[K]V{}
+	for index, key := range keys {
+		combine[key] = values[index]
+	}
+	return combine
 }
 
 func Product[T Numerable](array []T) T {
@@ -226,6 +236,10 @@ func Product[T Numerable](array []T) T {
 		product *= v
 	}
 	return product
+}
+
+func ColumnMap[K BasicType, V any](array *[]V, columnKey string) map[K]V {
+	return Combine[K, V](Column[K](array, columnKey), *array)
 }
 
 func Sort(array any, less func(i, j int) bool) {
@@ -300,6 +314,10 @@ func Except[T any](array map[string]T, keys []string) map[string]T {
 	return except
 }
 
-func Shuffle() {
-
+func Shuffle[T any](array []T) {
+	rand.Seed(time.Now().UnixNano())
+	for i := len(array) - 1; i >= 0; i-- {
+		index := rand.Int() % (i + 1)
+		array[index], array[i] = array[i], array[index]
+	}
 }

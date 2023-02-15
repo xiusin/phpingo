@@ -17,6 +17,8 @@ $arr = [
     ]
 ];
 
+array_combine(["z", 'c'], ["1"]);
+
 
 // print_r(array_unique($arr));
 
