@@ -25,6 +25,63 @@ func In[T comparable](needle T, haystack []T) bool {
 	return false
 }
 
+func Find[T any](haystack []T, cb func(item T, index int) bool) (val T, ok bool) {
+	if cb == nil {
+		cb = func(item T, index int) bool {
+			return true
+		}
+	}
+	for index, t := range haystack {
+		if cb(t, index) {
+			return t, true
+		}
+	}
+	return
+}
+
+func Some[T any](array []T, cb func(item T, index int) bool) bool {
+	if cb == nil {
+		cb = func(item T, index int) bool {
+			return true
+		}
+	}
+	var someResult = false
+	for index, t := range array {
+		someResult = cb(t, index)
+	}
+	return someResult
+}
+
+func Every[T any](array []T, cb func(item T, index int) bool) bool {
+	if cb == nil {
+		cb = func(item T, index int) bool {
+			return true
+		}
+	}
+	for index, t := range array {
+		if !cb(t, index) {
+			return false
+		}
+	}
+	return true
+}
+
+func Filter[T any](array []T, cb func(item T, index int) bool) []T {
+	var ret []T
+	if cb == nil {
+		cb = func(item T, index int) bool {
+			return true
+		}
+	}
+
+	for index, t := range array {
+		if cb(t, index) {
+			ret = append(ret, t)
+		}
+	}
+	return ret
+}
+
 func Chunk[T any](array []T, length int) [][]T {
 	var chunks [][]T
 	if length > 0 {
