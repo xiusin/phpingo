@@ -317,20 +317,20 @@ func Slice[T any](array []T, start int, length ...int) []T {
 func Splice[T any](array *[]T, offset int, length int, replacement []T) []T {
 	arrLen := len(*array)
 	var removed = make([]T, length)
-	var new = make([]T, offset, arrLen-length+len(replacement))
+	var newArr = make([]T, offset, arrLen-length+len(replacement))
 	if offset < 0 {
 		offset = -offset
 	}
-	copy(new, (*array)[:offset])
+	copy(newArr, (*array)[:offset])
 	if length == 0 || offset+length > len(*array) {
 		removed = (*array)[offset:]
-		new = append(new, replacement...)
+		newArr = append(newArr, replacement...)
 	} else {
 		removed = (*array)[offset : offset+length]
-		new = append(new, replacement...)
-		new = append(new, (*array)[offset+length:]...)
+		newArr = append(newArr, replacement...)
+		newArr = append(newArr, (*array)[offset+length:]...)
 	}
-	*array = new
+	*array = newArr
 	return removed
 }
 
